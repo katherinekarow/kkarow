@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process version="9.10.001">
+    <operator activated="true" class="read_document" compatibility="9.10.001" expanded="true" height="68" name="Read Document">
+        <parameter key="file" value=""/>
+        <parameter key="encoding" value="UTF-8"/>
+        <parameter key="extract_text_only" value="true"/>
+    </operator>
+
+    <operator activated="true" class="process_documents" compatibility="9.10.001" expanded="true" height="82" name="Text Processing">
+        <process expanded="true">
+            <operator activated="true" class="tokenize" compatibility="9.10.001" expanded="true" name="Tokenize">
+                <parameter key="mode" value="non-letters"/>
+            </operator>
+            <operator activated="true" class="transform_cases" compatibility="9.10.001" expanded="true" name="Lowercase">
+                <parameter key="transform_to" value="lower"/>
+            </operator>
+            <operator activated="true" class="filter_stopwords_english" compatibility="9.10.001" expanded="true" name="Stopword Filter"/>
+            <operator activated="true" class="stem_porter" compatibility="9.10.001" expanded="true" name="Stemmer"/>
+            <operator activated="true" class="generate_tfidf" compatibility="9.10.001" expanded="true" name="TF-IDF">
+                <parameter key="normalize" value="true"/>
+                <parameter key="add_meta_information" value="true"/>
+            </operator>
+        </process>
+    </operator>
+
+    <operator activated="true" class="k_means" compatibility="9.10.001" expanded="true" height="82" name="K-Means">
+        <parameter key="k" value="5"/>
+        <parameter key="max_runs" value="10"/>
+        <parameter key="distance" value="Cosine Similarity"/>
+    </operator>
+
+    <operator activated="true" class="fp_growth" compatibility="9.10.001" expanded="true" height="68" name="FP-Growth">
+        <parameter key="min_support" value="0.1"/>
+    </operator>
+
+    <connect from_op="Read Document" from_port="output" to_op="Text Processing" to_port="documents"/>
+    <connect from_op="Text Processing" from_port="example set" to_op="K-Means" to_port="example set"/>
+    <connect from_op="K-Means" from_port="example set (clustered)" to_op="FP-Growth" to_port="example set"/>
+</process>
+
